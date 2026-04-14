@@ -59,7 +59,7 @@ PPP--Face-Recognition/
 │   └── js/webcam.js
 │
 └── tests/
-    └── test_system.py      # Pytest test suite (25 tests)
+    
 ```
 
 ---
