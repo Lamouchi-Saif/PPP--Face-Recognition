@@ -142,17 +142,6 @@ COSINE_THRESHOLD    = 0.60   # similarity >= threshold → GRANTED
 EUCLIDEAN_THRESHOLD = 10.0   # distance  <= threshold → GRANTED
 ```
 
----
-
-## Running tests
-
-```bash
-python -m pytest tests/ -v
-```
-
-25 tests covering preprocessing, feature extraction (LBP, HOG), authentication
-logic, database CRUD, evaluation helpers, and Flask endpoints — all run without
-needing a real dataset or deep learning models.
 
 ---
 
