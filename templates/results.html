@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Results – FaceAuth</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    <nav class="navbar">
+      <span class="brand">🔒 FaceAuth</span>
+      <a href="{{ url_for('index') }}">Home</a>
+      <a href="{{ url_for('register_page') }}">Register</a>
+      <a href="{{ url_for('authenticate_page') }}">Authenticate</a>
+      <a href="{{ url_for('results_page') }}">Results</a>
+    </nav>
+
+    <main class="container">
+      <h1>Evaluation Results</h1>
+      <p>
+        Run <code>python train.py --data_dir data/lfw --method all</code> to
+        generate training metrics and comparison plots.
+      </p>
+
+      {% if plots %}
+      <div class="plots-grid">
+        {% for plot in plots %}
+        <figure>
+          <img
+            src="{{ url_for('static', filename='results/' ~ plot) }}"
+            alt="{{ plot }}"
+            loading="lazy"
+          />
+          <figcaption>
+            {{ plot | replace('_', ' ') | replace('.png', '') }}
+          </figcaption>
+        </figure>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="alert alert-info">
+        No result plots found. Train a model first with
+        <code>python train.py</code>.
+      </div>
+      {% endif %}
+    </main>
+  </body>
+</html>

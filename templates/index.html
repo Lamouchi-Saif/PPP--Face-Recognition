@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Face Recognition System</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    <nav class="navbar">
+      <span class="brand">🔒 FaceAuth</span>
+      <a href="{{ url_for('index') }}">Home</a>
+      <a href="{{ url_for('register_page') }}">Register</a>
+      <a href="{{ url_for('authenticate_page') }}">Authenticate</a>
+      <a href="{{ url_for('results_page') }}">Results</a>
+    </nav>
+
+    <main class="container">
+      <h1>Face Recognition &amp; Authentication System</h1>
+      <p class="lead">
+        A pipeline combining traditional feature extraction (Haar Cascade, LBP,
+        HOG) with Deep Learning (DeepFace) for robust face authentication.
+      </p>
+
+      <div class="cards">
+        <div class="card">
+          <h2>📷 Register</h2>
+          <p>Add a new identity by uploading or capturing a face image.</p>
+          <a class="btn" href="{{ url_for('register_page') }}">Register Face</a>
+        </div>
+        <div class="card">
+          <h2>🔐 Authenticate</h2>
+          <p>Verify your identity in real time using your webcam.</p>
+          <a class="btn" href="{{ url_for('authenticate_page') }}"
+            >Authenticate</a
+          >
+        </div>
+        <div class="card">
+          <h2>📊 Results</h2>
+          <p>View evaluation metrics and method comparison plots.</p>
+          <a class="btn" href="{{ url_for('results_page') }}">View Results</a>
+        </div>
+      </div>
+
+      <h2>Registered Identities ({{ identities | length }})</h2>
+      {% if identities %}
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Registered</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for identity in identities %}
+          <tr>
+            <td>{{ identity.id }}</td>
+            <td>{{ identity.name }}</td>
+            <td>{{ identity.created_at }}</td>
+            <td>
+              <button
+                class="btn btn-danger btn-sm"
+                onclick="deleteIdentity('{{ identity.name }}')"
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>No identities registered yet.</p>
+      {% endif %} {% if not deepface_available %}
+      <div class="alert alert-warning">
+        ⚠️ DeepFace is not installed. Install it with:
+        <code>pip install deepface</code>
+      </div>
+      {% endif %}
+    </main>
+
+    <script>
+      async function deleteIdentity(name) {
+        if (!confirm(`Delete identity "${name}"?`)) return;
+        const resp = await fetch(`/api/identity/${encodeURIComponent(name)}`, {
+          method: "DELETE",
+        });
+        if (resp.ok) location.reload();
+        else alert("Failed to delete identity.");
+      }
+    </script>
+  </body>
+</html>

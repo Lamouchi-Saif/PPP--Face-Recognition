@@ -1,0 +1,242 @@
+/* ── Reset & Base ──────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: #f0f4f8;
+  color: #2d3748;
+  min-height: 100vh;
+}
+
+/* ── Navbar ──────────────────────────────────────────────────────────────────── */
+.navbar {
+  background: #2b6cb0;
+  padding: 0.75rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+.navbar .brand {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  margin-right: auto;
+}
+.navbar a {
+  color: #bee3f8;
+  text-decoration: none;
+  font-weight: 500;
+}
+.navbar a:hover {
+  color: #fff;
+}
+
+/* ── Container ───────────────────────────────────────────────────────────────── */
+.container {
+  max-width: 960px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+h2 {
+  font-size: 1.4rem;
+  margin: 1.5rem 0 0.5rem;
+}
+.lead {
+  color: #4a5568;
+  margin-bottom: 2rem;
+}
+
+/* ── Cards ───────────────────────────────────────────────────────────────────── */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+.card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.card h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-block;
+  padding: 0.55rem 1.2rem;
+  border-radius: 6px;
+  border: none;
+  background: #3182ce;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.btn:hover {
+  background: #2c5282;
+}
+.btn-danger {
+  background: #e53e3e;
+}
+.btn-danger:hover {
+  background: #c53030;
+}
+.btn-secondary {
+  background: #718096;
+}
+.btn-secondary:hover {
+  background: #4a5568;
+}
+.btn-sm {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.8rem;
+}
+.btn-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+/* ── Panel ───────────────────────────────────────────────────────────────────── */
+.panel {
+  background: #fff;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 640px;
+}
+.panel label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.panel input[type="text"],
+.panel select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+/* ── Webcam ───────────────────────────────────────────────────────────────────── */
+.webcam-wrapper {
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+}
+.webcam-wrapper video {
+  width: 100%;
+  max-height: 360px;
+  display: block;
+}
+
+/* ── Status / Result boxes ──────────────────────────────────────────────────── */
+.status-box,
+.result-box {
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 1rem;
+}
+.status-info {
+  background: #ebf8ff;
+  color: #2b6cb0;
+}
+.status-success,
+.result-success {
+  background: #f0fff4;
+  color: #276749;
+  border: 1px solid #9ae6b4;
+}
+.status-error,
+.result-error {
+  background: #fff5f5;
+  color: #c53030;
+  border: 1px solid #fc8181;
+}
+.result-denied {
+  background: #fff5f5;
+  color: #c53030;
+  border: 1px solid #fc8181;
+}
+
+/* ── Table ───────────────────────────────────────────────────────────────────── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+th,
+td {
+  padding: 0.65rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+thead {
+  background: #edf2f7;
+}
+
+/* ── Alerts ──────────────────────────────────────────────────────────────────── */
+.alert {
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+.alert-warning {
+  background: #fffbeb;
+  color: #744210;
+  border: 1px solid #f6e05e;
+}
+.alert-info {
+  background: #ebf8ff;
+  color: #2b6cb0;
+  border: 1px solid #90cdf4;
+}
+
+/* ── Plots grid ──────────────────────────────────────────────────────────────── */
+.plots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+.plots-grid figure {
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+.plots-grid img {
+  width: 100%;
+}
+.plots-grid figcaption {
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  text-align: center;
+  color: #718096;
+}

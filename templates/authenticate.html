@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Authenticate – FaceAuth</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    <nav class="navbar">
+      <span class="brand">🔒 FaceAuth</span>
+      <a href="{{ url_for('index') }}">Home</a>
+      <a href="{{ url_for('register_page') }}">Register</a>
+      <a href="{{ url_for('authenticate_page') }}">Authenticate</a>
+      <a href="{{ url_for('results_page') }}">Results</a>
+    </nav>
+
+    <main class="container">
+      <h1>Face Authentication</h1>
+
+      <div class="panel">
+        <label for="auth-method">Feature Method</label>
+        <select id="auth-method">
+          <option value="deepface">DeepFace (recommended)</option>
+          <option value="haar">Haar Cascade</option>
+          <option value="lbp">LBP</option>
+          <option value="hog">HOG</option>
+        </select>
+
+        <label for="auth-metric">Similarity Metric</label>
+        <select id="auth-metric">
+          <option value="cosine">Cosine Similarity</option>
+          <option value="euclidean">Euclidean Distance</option>
+        </select>
+
+        <div class="webcam-wrapper">
+          <video id="video" autoplay playsinline></video>
+          <canvas id="canvas" style="display: none"></canvas>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn" id="start-camera">📷 Start Camera</button>
+          <button class="btn" id="auth-btn" disabled>🔐 Authenticate</button>
+          <button class="btn btn-secondary" id="auto-btn" disabled>
+            ▶ Live (every 3 s)
+          </button>
+        </div>
+
+        <div id="result-box" class="result-box" style="display: none"></div>
+      </div>
+    </main>
+
+    <script>
+      const video = document.getElementById("video");
+      const canvas = document.getElementById("canvas");
+      const resultBox = document.getElementById("result-box");
+      const authBtn = document.getElementById("auth-btn");
+      const startBtn = document.getElementById("start-camera");
+      const autoBtn = document.getElementById("auto-btn");
+      let autoInterval = null;
+
+      startBtn.addEventListener("click", async () => {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+          });
+          video.srcObject = stream;
+          authBtn.disabled = false;
+          autoBtn.disabled = false;
+          startBtn.textContent = "🔴 Camera On";
+        } catch (err) {
+          showResult(`Camera error: ${err.message}`, "error");
+        }
+      });
+
+      authBtn.addEventListener("click", () => authenticate());
+
+      autoBtn.addEventListener("click", () => {
+        if (autoInterval) {
+          clearInterval(autoInterval);
+          autoInterval = null;
+          autoBtn.textContent = "▶ Live (every 3 s)";
+        } else {
+          autoInterval = setInterval(authenticate, 3000);
+          autoBtn.textContent = "⏹ Stop Live";
+        }
+      });
+
+      async function authenticate() {
+        const method = document.getElementById("auth-method").value;
+        const metric = document.getElementById("auth-metric").value;
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext("2d").drawImage(video, 0, 0);
+        const dataUrl = canvas.toDataURL("image/jpeg");
+
+        const resp = await fetch("/api/authenticate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ image: dataUrl, method, metric }),
+        });
+        const data = await resp.json();
+
+        if (!resp.ok) {
+          showResult(`❌ Error: ${data.error}`, "error");
+          return;
+        }
+
+        const granted = data.decision === "ACCESS GRANTED";
+        const scoreLabel = metric === "cosine" ? "similarity" : "distance";
+        const score =
+          data.best_score !== null && data.best_score !== undefined
+            ? ` | ${scoreLabel}: ${Number(data.best_score).toFixed(4)}`
+            : "";
+        const msg = granted
+          ? `✅ ${data.decision} — ${data.identity}${score}`
+          : `🚫 ${data.decision}${score}`;
+        showResult(msg, granted ? "success" : "denied");
+      }
+
+      function showResult(msg, type) {
+        resultBox.textContent = msg;
+        resultBox.className = `result-box result-${type}`;
+        resultBox.style.display = "block";
+      }
+    </script>
+  </body>
+</html>

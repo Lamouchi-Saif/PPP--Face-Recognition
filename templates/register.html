@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register – FaceAuth</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    <nav class="navbar">
+      <span class="brand">🔒 FaceAuth</span>
+      <a href="{{ url_for('index') }}">Home</a>
+      <a href="{{ url_for('register_page') }}">Register</a>
+      <a href="{{ url_for('authenticate_page') }}">Authenticate</a>
+      <a href="{{ url_for('results_page') }}">Results</a>
+    </nav>
+
+    <main class="container">
+      <h1>Register New Identity</h1>
+
+      <div class="panel">
+        <label for="identity-name">Full Name</label>
+        <input id="identity-name" type="text" placeholder="e.g. Alice Smith" />
+
+        <label for="method-select">Feature Method</label>
+        <select id="method-select">
+          <option value="deepface">DeepFace (recommended)</option>
+          <option value="haar">Haar Cascade</option>
+          <option value="lbp">LBP</option>
+          <option value="hog">HOG</option>
+        </select>
+
+        <div class="webcam-wrapper">
+          <video id="video" autoplay playsinline></video>
+          <canvas id="canvas" style="display: none"></canvas>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn" id="start-camera">📷 Start Camera</button>
+          <button class="btn" id="capture-btn" disabled>
+            ✅ Capture &amp; Register
+          </button>
+        </div>
+
+        <div id="preview-wrapper" style="display: none">
+          <h3>Captured image:</h3>
+          <img
+            id="preview"
+            alt="captured"
+            style="max-width: 300px; border-radius: 8px"
+          />
+        </div>
+
+        <div id="status" class="status-box" style="display: none"></div>
+      </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/webcam.js') }}"></script>
+    <script>
+      const video = document.getElementById("video");
+      const canvas = document.getElementById("canvas");
+      const preview = document.getElementById("preview");
+      const previewWrapper = document.getElementById("preview-wrapper");
+      const statusBox = document.getElementById("status");
+      const captureBtn = document.getElementById("capture-btn");
+      const startBtn = document.getElementById("start-camera");
+
+      startBtn.addEventListener("click", async () => {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+          });
+          video.srcObject = stream;
+          captureBtn.disabled = false;
+          startBtn.textContent = "🔴 Camera On";
+        } catch (err) {
+          showStatus(`Camera error: ${err.message}`, "error");
+        }
+      });
+
+      captureBtn.addEventListener("click", async () => {
+        const name = document.getElementById("identity-name").value.trim();
+        if (!name) {
+          showStatus("Please enter a name.", "error");
+          return;
+        }
+
+        const method = document.getElementById("method-select").value;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext("2d").drawImage(video, 0, 0);
+
+        const dataUrl = canvas.toDataURL("image/jpeg");
+        preview.src = dataUrl;
+        previewWrapper.style.display = "block";
+        showStatus("Registering…", "info");
+
+        const resp = await fetch("/api/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, image: dataUrl, method }),
+        });
+        const data = await resp.json();
+
+        if (resp.ok) {
+          showStatus(
+            `✅ Registered "${data.identity}" using ${data.method} (dim=${data.embedding_dim}).`,
+            "success",
+          );
+        } else {
+          showStatus(`❌ Error: ${data.error}`, "error");
+        }
+      });
+
+      function showStatus(msg, type) {
+        statusBox.textContent = msg;
+        statusBox.className = `status-box status-${type}`;
+        statusBox.style.display = "block";
+      }
+    </script>
+  </body>
+</html>
